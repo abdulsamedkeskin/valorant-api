@@ -31,3 +31,8 @@ ItemTypeID = {
     "3ad1b2b2-acdb-4524-852f-954a76ddae0a": "skinLevels",
     "de7caa6b-adf7-4588-bbd1-143831e786c6": "playerTitles"
 }
+currency = {
+    "85ad13f7-3d1b-5128-9eb2-7cd8ee0b5741": "VP",
+    "f08d4ae3-939c-4576-ab26-09ce1f23bb37": "Free Agent",
+    "e59aa87c-4cbf-517a-5983-6e81511be9b7": "Radianite Point"
+}
