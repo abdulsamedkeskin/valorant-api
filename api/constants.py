@@ -30,4 +30,4 @@ ItemTypeID = {
     "e7c63390-eda7-46e0-bb7a-a6abdacd2433": "skins",
     "3ad1b2b2-acdb-4524-852f-954a76ddae0a": "skinLevels",
     "de7caa6b-adf7-4588-bbd1-143831e786c6": "playerTitles"
-  }
+}

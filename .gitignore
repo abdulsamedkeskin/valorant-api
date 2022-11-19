@@ -4,7 +4,7 @@ __pycache__/
 *$py.class
 
 http_cache.sqlite
-contents.json
+contents*.json
 # C extensions
 *.so
 

@@ -4,17 +4,16 @@ import json
 
 session = requests_cache.CachedSession(expire_after=timedelta(days=1))
 
-
-def get_contents():
-    contracts = session.get("https://valorant-api.com/v1/contracts")
-    buddies = session.get("https://valorant-api.com/v1/buddies/levels")
-    bundles = session.get("https://valorant-api.com/v1/bundles")
-    player_cards = session.get("https://valorant-api.com/v1/playercards")
-    player_titles = session.get("https://valorant-api.com/v1/playertitles")
-    skin_levels = session.get("https://valorant-api.com/v1/weapons/skinlevels")
-    skins = session.get("https://valorant-api.com/v1/weapons/skins")
-    characters = session.get("https://valorant-api.com/v1/agents?isPlayableCharacter=true")
-    sprays = session.get("https://valorant-api.com/v1/sprays")
+def get_contents(language="en-US"):
+    contracts = session.get(f"https://valorant-api.com/v1/contracts?language={language}")
+    buddies = session.get(f"https://valorant-api.com/v1/buddies/levels?language={language}")
+    bundles = session.get(f"https://valorant-api.com/v1/bundles?language={language}")
+    player_cards = session.get(f"https://valorant-api.com/v1/playercards?language={language}")
+    player_titles = session.get(f"https://valorant-api.com/v1/playertitles?language={language}")
+    skin_levels = session.get(f"https://valorant-api.com/v1/weapons/skinlevels?language={language}")
+    skins = session.get(f"https://valorant-api.com/v1/weapons/skins?language={language}")
+    characters = session.get(f"https://valorant-api.com/v1/agents?isPlayableCharacter=true&language={language}")
+    sprays = session.get(f"https://valorant-api.com/v1/sprays?language={language}")
     if not contracts.from_cache or not buddies.from_cache or not bundles.from_cache or not player_cards.from_cache or not player_titles.from_cache or not skin_levels.from_cache or not skins.from_cache or not characters.from_cache or not sprays.from_cache:
         res = {}
         res.update({"Contracts": contracts.json()['data']})
@@ -26,10 +25,10 @@ def get_contents():
         res.update({"skins": skins.json()['data']})
         res.update({"characters": characters.json()['data']})
         res.update({"sprays": sprays.json()['data']})
-        with open('contents.json', 'w', encoding='utf-8') as f:
+        with open(f'contents_{language}.json', 'w', encoding='utf-8') as f:
             f.write(json.dumps([res], ensure_ascii=False))
         return [res]
     else:
-        with open('contents.json', 'r') as f:
+        with open(f'contents_{language}.json', 'r', encoding="utf8") as f:
             return json.loads(f.read())
      

@@ -20,13 +20,14 @@ def offers():
 def shop():
   scraper = cloudscraper.create_scraper(browser=user_agent)
   body = request.get_json()
+  language = request.args.get("language", "en-US")
   base_header.update({
     "X-Riot-Entitlements-JWT": body.get('entitlement_token'),
     "Authorization": f"Bearer {body.get('access_token')}"
   })
   r = scraper.get(f"https://pd.{body.get('region')}.a.pvp.net/store/v2/storefront/{body.get('puuid')}", headers=base_header)
   r = r.json()
-  contents = get_contents()
+  contents = get_contents(language=language)
   data = []
   data_ = {}
   for i in r['SkinsPanelLayout']['SingleItemOffers']:
@@ -70,13 +71,14 @@ def wallet():
 @store.route("my_skins", methods=['POST'])
 def my_skins():
   body = request.get_json()
+  language = request.args.get("language", "en-US")
   base_header.update({
     "X-Riot-Entitlements-JWT": body.get('entitlement_token'),
     "Authorization": f"Bearer {body.get('access_token')}"
   })
   r = session.get(f"https://pd.{body.get('region')}.a.pvp.net/store/v1/entitlements/{body.get('puuid')}", headers=base_header)
   r = r.json()
-  contents = get_contents()
+  contents = get_contents(language=language)
   data = []
   for i in r['EntitlementsByTypes']:
     type_ = ItemTypeID[i['ItemTypeID']]
