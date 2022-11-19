@@ -85,12 +85,22 @@ def my_skins():
     i['type'] = type_
     del i['ItemTypeID']
     data_ = {}
+    if type_ == 'skinLevels':
+      type_ = 'skins'
     for _ in i['Entitlements']:
       for x in contents[0][type_]:
-        try:
-          if _['ItemID'] == x['uuid']:
-            data_.update({x['displayName']: x})
-        except KeyError:
-          continue
+        if type_ == 'skins':
+          try:
+            z = next(item for item in x['chromas'] if item["uuid"] == _['ItemID'])
+            data_.update({z['displayName']: z})
+          except:
+            pass
+          try:
+            y = next(item for item in x['levels'] if item["uuid"] == _['ItemID'])
+            data_.update({y['displayName']: y})
+          except:
+            pass
+        elif _['ItemID'] == x['uuid']:
+          data_.update({x['displayName']: x})
     data.append({"type": type_, "data": data_})
   return data
