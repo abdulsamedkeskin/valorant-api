@@ -30,33 +30,26 @@ def shop():
   data = []
   data_ = {}
   for i in r['SkinsPanelLayout']['SingleItemOffers']:
-    for _ in contents[0]['skinLevels']:
-      if _['uuid'] == i:
-        displayName = _['displayName']
-        del _['displayName']
-        data_.update({displayName: _})     
+    _ = next(item for item in contents[0]['skinLevels'] if item["uuid"] == i)
+    data_.update({_['displayName']: _})     
   data.append({"type": "single","remaning_time_in_seconds": r['SkinsPanelLayout']['SingleItemOffersRemainingDurationInSeconds'], "data": data_ }) 
   for i in r['FeaturedBundle']['Bundles']:
     data_ = {}
     data__ = {}
-    for _ in contents[0]['bundles']:
-      if _['uuid'] == i['DataAssetID']:
-        for x in i['Items']:
-          if x['Item']['ItemTypeID'] == "e7c63390-eda7-46e0-bb7a-a6abdacd2433":
-            type_id = '3ad1b2b2-acdb-4524-852f-954a76ddae0a'
-          else:
-            type_id = x['Item']['ItemTypeID']
-          for z in contents[0][ItemTypeID[type_id]]:
-            if z['uuid'] == x['Item']['ItemID']:
-              displayName = z['displayName']
-              del z['displayName']
-              z['BasePrice'] = x['BasePrice']
-              z['DiscountPercent'] = x['DiscountPercent']
-              z['DiscountedPrice'] = x['DiscountedPrice']
-              z['IsPromoItem'] = x['IsPromoItem']
-              data__.update({displayName: z})
-        _['items'] = data__
-        data_.update({_['displayName']: _,})
+    _ = next(item for item in contents[0]['bundles'] if item["uuid"] == i['DataAssetID'])
+    for x in i['Items']:
+      if x['Item']['ItemTypeID'] == "e7c63390-eda7-46e0-bb7a-a6abdacd2433":
+        type_id = '3ad1b2b2-acdb-4524-852f-954a76ddae0a'
+      else:
+        type_id = x['Item']['ItemTypeID']
+      z = next(item for item in contents[0][ItemTypeID[type_id]] if item["uuid"] == x['Item']['ItemID'])
+      z['BasePrice'] = x['BasePrice']
+      z['DiscountPercent'] = x['DiscountPercent']
+      z['DiscountedPrice'] = x['DiscountedPrice']
+      z['IsPromoItem'] = x['IsPromoItem']
+      data__.update({z['displayName']: z})
+    _['items'] = data__
+    data_.update({_['displayName']: _,})
   data.append({"remaning_time_in_seconds": r['FeaturedBundle']['BundleRemainingDurationInSeconds'], "type": "bundle", "data": data_})
   return data
 
@@ -94,9 +87,7 @@ def my_skins():
       for x in contents[0][type_]:
         try:
           if _['ItemID'] == x['uuid']:
-            displayName = x['displayName']
-            del x['displayName']
-            data_.update({displayName: x})
+            data_.update({x['displayName']: x})
         except KeyError:
           continue
     data.append({"type": type_, "data": data_})
