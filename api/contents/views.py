@@ -6,7 +6,7 @@ contents = Blueprint('contents', __name__, url_prefix='/contents')
 @contents.get("/<content_type>")
 def fetch_contents(content_type):
   language = request.args.get("language", "en-US")
-  for_alert = request.args.get("for_alert")
+  for_alert = request.args.get("for_alert", False)
   contents = get_contents(language=language)
   if for_alert:
     data = []
