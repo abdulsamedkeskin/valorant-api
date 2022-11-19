@@ -4,7 +4,7 @@ from api.utils import get_contents
 contents = Blueprint('contents', __name__, url_prefix='/contents')
 
 @contents.get("/<content_type>")
-def offers(content_type):
+def fetch_contents(content_type):
   language = request.args.get("language", "en-US")
   for_alert = request.args.get("for_alert")
   contents = get_contents(language=language)
