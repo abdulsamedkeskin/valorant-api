@@ -15,18 +15,21 @@ def login():
     auth = scraper.put("https://auth.riotgames.com/api/v1/authorization", json=multifactor_payload, cookies=body.get('cookies')).json()
     if auth['type'] == 'error':
       return auth
-    accessToken = parse_accessToken(auth)
+    id_token, accessToken = parse_accessToken(auth)
     base_header.update({
         "Authorization": f"Bearer {accessToken}",
     })
     entitlement_token = scraper.post("https://entitlements.auth.riotgames.com/api/token/v1", headers=base_header)
     entitlement_token = entitlement_token.json()['entitlements_token']
     user = jwt.decode(accessToken, options={"verify_signature": False})
+    user = jwt.decode(accessToken, options={"verify_signature": False})
+    account_name = jwt.decode(id_token, options={"verify_signature": False})['acct']
     return {
       "access_token": accessToken,
       "entitlement_token": entitlement_token,
       "puuid": user['sub'],
       "region": user['pp']['c'],
+      **account_name,
       "cookies": scraper.cookies.get_dict()
     }
   scraper = cloudscraper.create_scraper(browser=user_agent)
@@ -40,18 +43,20 @@ def login():
       "email": auth['multifactor']['email'],
       "cookies": scraper.cookies.get_dict()
     }, 200
-  accessToken = parse_accessToken(auth)
+  id_token, accessToken = parse_accessToken(auth)
   base_header.update({
         "Authorization": f"Bearer {accessToken}",
   })
   entitlement_token = scraper.post("https://entitlements.auth.riotgames.com/api/token/v1", headers=base_header)
   entitlement_token = entitlement_token.json()['entitlements_token']
   user = jwt.decode(accessToken, options={"verify_signature": False})
+  account_name = jwt.decode(id_token, options={"verify_signature": False})['acct']
   return {
     "access_token": accessToken,
     "entitlement_token": entitlement_token,
     "puuid": user['sub'],
     "region": user['pp']['c'],
+    **account_name,
     "cookies": scraper.cookies.get_dict()
   }
   
