@@ -5,6 +5,8 @@ __pycache__/
 
 http_cache.sqlite
 contents*.json
+app.db
+
 # C extensions
 *.so
 
