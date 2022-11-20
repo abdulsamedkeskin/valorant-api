@@ -63,7 +63,7 @@ def shop():
     "X-Riot-Entitlements-JWT": body.get('entitlement_token'),
     "Authorization": f"Bearer {body.get('access_token')}"
   })
-  r = scraper.get(f"https://pd.{body.get('region')}.a.pvp.net/store/v2/storefront/{body.get('puuid')}", headers=base_header)
+  r = session.get(f"https://pd.{body.get('region')}.a.pvp.net/store/v2/storefront/{body.get('puuid')}", headers=base_header)
   r = r.json()
   contents = get_contents(language=language)
   data = []
@@ -84,12 +84,12 @@ def shop():
       data__.append(z)
     _['items'] = data__
     data_.append(_)
-  data.append({"type": "bundle", "remaning_time_in_seconds": r['FeaturedBundle']['BundleRemainingDurationInSeconds'], "data": data_})
+  data.append({"type": "bundle", "remaining_time_in_seconds": r['FeaturedBundle']['BundleRemainingDurationInSeconds'], "data": data_})
   data_ = []
   for i in r['SkinsPanelLayout']['SingleItemOffers']:
     _ = next(item for item in contents[0]['skinLevels'] if item["uuid"] == i)
     data_.append(_)     
-  data.append({"type": "single","remaning_time_in_seconds": r['SkinsPanelLayout']['SingleItemOffersRemainingDurationInSeconds'], "data": data_ }) 
+  data.append({"type": "single","remaining_time_in_seconds": r['SkinsPanelLayout']['SingleItemOffersRemainingDurationInSeconds'], "data": data_ }) 
   return data
 
 @store.route("/wallet", methods=['POST'])
