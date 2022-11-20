@@ -84,7 +84,14 @@ def refresh():
     }, 400
   scraper = cloudscraper.create_scraper(browser=user_agent)
   refresh_token = scraper.get("https://auth.riotgames.com/authorize?redirect_uri=https%3A%2F%2Fplayvalorant.com%2Fopt_in&client_id=play-valorant-web-prod&response_type=token%20id_token&nonce=1", allow_redirects=False, cookies=cookies)
-  accessToken = refresh_token.text.split("access_token=")[1].split("&amp")[0]
+  try:
+    accessToken = refresh_token.text.split("access_token=")[1].split("&amp")[0]
+  except:
+    return {
+      "status":400,
+      "name": "BAD_REQUEST",
+      "description": "need to login again"
+    }, 400
   base_header.update({
         "Authorization": f"Bearer {accessToken}",
   })
