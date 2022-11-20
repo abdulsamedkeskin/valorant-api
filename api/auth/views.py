@@ -6,6 +6,15 @@ import jwt
 
 auth = Blueprint('auth', __name__, url_prefix='/auth')
 
+
+@auth.route("/prepare", methods=['GET'])
+def prepare():
+  scraper = cloudscraper.create_scraper(browser=user_agent)
+  cookie_request = scraper.post("https://auth.riotgames.com/api/v1/authorization", json=auth_cookies)
+  return {
+    "cookies": cookie_request.cookies.get_dict()
+  }
+
 @auth.route("/login", methods=['POST', 'PUT'])
 def login():
   if request.method == 'PUT':
@@ -34,9 +43,8 @@ def login():
     }
   scraper = cloudscraper.create_scraper(browser=user_agent)
   args = request.get_json()
-  cookie_request = scraper.post("https://auth.riotgames.com/api/v1/authorization", json=auth_cookies)
   auth_payload.update({"username": args['username'],"password": args['password']})
-  auth = scraper.put("https://auth.riotgames.com/api/v1/authorization", json=auth_payload, cookies=cookie_request.cookies, headers=base_header).json()
+  auth = scraper.put("https://auth.riotgames.com/api/v1/authorization", json=auth_payload, cookies=args.get('cookies'), headers=base_header).json()
   if auth['type'] == "multifactor":
     return {
       "type": "multifactor",
@@ -71,8 +79,11 @@ def refresh():
   })
   entitlement_token = scraper.post("https://entitlements.auth.riotgames.com/api/token/v1", headers=base_header)
   entitlement_token = entitlement_token.json()['entitlements_token']
+  user = jwt.decode(accessToken, options={"verify_signature": False})
   return {
     "access_token": accessToken,
     "entitlement_token": entitlement_token,
+    "puuid": user['sub'],
+    "region": user['pp']['c'],
     "cookies": scraper.cookies.get_dict()
   }
