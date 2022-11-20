@@ -37,12 +37,3 @@ class Tokens(db.Model):
         self.language = language
         self.access_token = f.encrypt(bytes(access_token, encoding='utf-8'))
         self.entitlement_token = f.encrypt(bytes(entitlement_token, encoding='utf-8'))
-    
-class Login(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    cookies = db.Column(db.String, nullable=False)
-    response = db.Column(db.String, nullable=False)
-    
-    def __init__(self,cookies, response):
-        self.cookies = cookies
-        self.response = f.encrypt(bytes(response, encoding='utf-8'))

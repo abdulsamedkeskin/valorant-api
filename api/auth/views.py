@@ -52,27 +52,14 @@ def login():
   entitlement_token = entitlement_token.json()['entitlements_token']
   user = jwt.decode(accessToken, options={"verify_signature": False})
   account_name = jwt.decode(id_token, options={"verify_signature": False})['acct']
-  cookies = scraper.cookies.get_dict()
-  response = {
+  return {
+    "cookies": scraper.cookies.get_dict(),
     "access_token": accessToken,
     "entitlement_token": entitlement_token,
     "puuid": user['sub'],
     "region": user['pp']['c'],
     **account_name
   }
-  login = Login(cookies=str(cookies),response=str(response))
-  db.session.add(login)
-  db.session.commit()
-  return {
-    "cookies": cookies
-  }
-  
-@auth.route("/user", methods=['POST'])
-def user():
-  body = request.get_json()
-  login = Login.query.filter_by(cookies=str(body.get('cookies'))).first()
-  response = f.decrypt(bytes(list(login.response))).decode("utf-8").replace("\'", "\"")
-  return json.loads(response)
   
 @auth.route("/refresh", methods=['POST'])
 def refresh():
