@@ -17,10 +17,9 @@ def offers():
   r = r.json()
   contents = get_contents(language=language)
   data = []
-  data_ = {}
   for i in r['Offers']:
     for _ in i['Rewards']:
-      data_ = {}
+      data_ = []
       if _['ItemTypeID'] == 'ea6fcd2e-8373-4137-b1c0-b458947aa86d':
         type_ = "Radianite"
         data.append({"type": type_,"quantity": _['Quantity']})
@@ -36,7 +35,7 @@ def offers():
               a['price'] = price
               a['quantity'] = _['Quantity']
               a['start_date'] = i['StartDate']
-              data_.update({a['displayName']: a})
+              data_.append(a)
             except:
               pass
             try:
@@ -44,15 +43,15 @@ def offers():
               y['price'] = price
               y['quantity'] = _['Quantity']
               y['start_date'] = i['StartDate']
-              data_.update({y['displayName']: y})
+              data_.append(y)
             except:
               pass
           if z['uuid'] == _['ItemID']:
             z['price'] = price
             z['quantity'] = _['Quantity']
             z['start_date'] = i['StartDate']
-            data_.update({z['displayName']: z})
-      data.append({"type": type_, **data_})
+            data_.append(z)
+      data.append({"type": type_, "data": data_[0]})
   return data
 
 @store.route("/current", methods=['POST'])
@@ -68,14 +67,9 @@ def shop():
   r = r.json()
   contents = get_contents(language=language)
   data = []
-  data_ = {}
-  for i in r['SkinsPanelLayout']['SingleItemOffers']:
-    _ = next(item for item in contents[0]['skinLevels'] if item["uuid"] == i)
-    data_.update({_['displayName']: _})     
-  data.append({"type": "single","remaning_time_in_seconds": r['SkinsPanelLayout']['SingleItemOffersRemainingDurationInSeconds'], "data": data_ }) 
   for i in r['FeaturedBundle']['Bundles']:
-    data_ = {}
-    data__ = {}
+    data_ = []
+    data__ = []
     _ = next(item for item in contents[0]['bundles'] if item["uuid"] == i['DataAssetID'])
     for x in i['Items']:
       if x['Item']['ItemTypeID'] == "e7c63390-eda7-46e0-bb7a-a6abdacd2433":
@@ -87,10 +81,15 @@ def shop():
       z['DiscountPercent'] = x['DiscountPercent']
       z['DiscountedPrice'] = x['DiscountedPrice']
       z['IsPromoItem'] = x['IsPromoItem']
-      data__.update({z['displayName']: z})
+      data__.append(z)
     _['items'] = data__
-    data_.update({_['displayName']: _,})
+    data_.append(_)
   data.append({"type": "bundle", "remaning_time_in_seconds": r['FeaturedBundle']['BundleRemainingDurationInSeconds'], "data": data_})
+  data_ = []
+  for i in r['SkinsPanelLayout']['SingleItemOffers']:
+    _ = next(item for item in contents[0]['skinLevels'] if item["uuid"] == i)
+    data_.append(_)     
+  data.append({"type": "single","remaning_time_in_seconds": r['SkinsPanelLayout']['SingleItemOffersRemainingDurationInSeconds'], "data": data_ }) 
   return data
 
 @store.route("/wallet", methods=['POST'])
@@ -124,7 +123,7 @@ def my_skins():
     type_ = ItemTypeID[i['ItemTypeID']]
     i['type'] = type_
     del i['ItemTypeID']
-    data_ = {}
+    data_ = []
     if type_ == 'skinLevels':
       type_ = 'skins'
     for _ in i['Entitlements']:
@@ -132,15 +131,15 @@ def my_skins():
         if type_ == 'skins':
           try:
             z = next(item for item in x['chromas'] if item["uuid"] == _['ItemID'])
-            data_.update({z['displayName']: z})
+            data_.append(z)
           except:
             pass
           try:
             y = next(item for item in x['levels'] if item["uuid"] == _['ItemID'])
-            data_.update({y['displayName']: y})
+            data_.append(y)
           except:
             pass
         elif _['ItemID'] == x['uuid']:
-          data_.update({x['displayName']: x})
+          data_.append(x)
     data.append({"type": type_, "data": data_})
   return data

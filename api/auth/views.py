@@ -2,18 +2,10 @@ from flask import Blueprint, request
 import cloudscraper
 from ..constants import auth_cookies, auth_payload, multifactor_payload, user_agent, base_header
 from .utils import parse_accessToken
-import jwt
+import jwt, json
+from api.models import db, Login, f
 
 auth = Blueprint('auth', __name__, url_prefix='/auth')
-
-
-@auth.route("/prepare", methods=['GET'])
-def prepare():
-  scraper = cloudscraper.create_scraper(browser=user_agent)
-  cookie_request = scraper.post("https://auth.riotgames.com/api/v1/authorization", json=auth_cookies)
-  return {
-    "cookies": cookie_request.cookies.get_dict()
-  }
 
 @auth.route("/login", methods=['POST', 'PUT'])
 def login():
@@ -43,8 +35,9 @@ def login():
     }
   scraper = cloudscraper.create_scraper(browser=user_agent)
   args = request.get_json()
+  cookie_request = scraper.post("https://auth.riotgames.com/api/v1/authorization", json=auth_cookies)
   auth_payload.update({"username": args['username'],"password": args['password']})
-  auth = scraper.put("https://auth.riotgames.com/api/v1/authorization", json=auth_payload, cookies=args.get('cookies'), headers=base_header).json()
+  auth = scraper.put("https://auth.riotgames.com/api/v1/authorization", json=auth_payload, cookies=cookie_request.cookies, headers=base_header).json()
   if auth['type'] == "multifactor":
     return {
       "type": "multifactor",
@@ -59,14 +52,29 @@ def login():
   entitlement_token = entitlement_token.json()['entitlements_token']
   user = jwt.decode(accessToken, options={"verify_signature": False})
   account_name = jwt.decode(id_token, options={"verify_signature": False})['acct']
-  return {
+  cookies = scraper.cookies.get_dict()
+  response = {
     "access_token": accessToken,
     "entitlement_token": entitlement_token,
     "puuid": user['sub'],
     "region": user['pp']['c'],
-    **account_name,
-    "cookies": scraper.cookies.get_dict()
+    **account_name
   }
+  login = Login(cookies=str(cookies),response=str(response))
+  db.session.add(login)
+  db.session.commit()
+  return {
+    "cookies": cookies
+  }
+  
+@auth.route("/user", methods=['POST'])
+def user():
+  body = request.get_json()
+  login = Login.query.filter_by(cookies=str(body.get('cookies'))).first()
+  response = f.decrypt(bytes(list(login.response))).decode("utf-8").replace("\'", "\"")
+  db.session.delete(login)
+  db.session.commit()
+  return json.loads(response)
   
 @auth.route("/refresh", methods=['POST'])
 def refresh():

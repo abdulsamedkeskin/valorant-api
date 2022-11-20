@@ -6,6 +6,7 @@ __pycache__/
 http_cache.sqlite
 contents*.json
 app.db
+migrations
 
 # C extensions
 *.so

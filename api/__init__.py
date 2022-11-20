@@ -1,12 +1,19 @@
 from flask import Flask
 from .config import Config
 from .models import db
+from flask_migrate import Migrate
+from flask_cors import CORS
+from flask_mail import Mail
 
+f_mail = Mail()
 
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
     db.init_app(app)
+    Migrate(app, db)
+    CORS(app)
+    f_mail.init_app(app)
     from .auth import auth
     from .store import store
     from .game import game
