@@ -1,26 +1,23 @@
 from flask import Blueprint, request
-from api.models import db, Reminder
+from api.models import db, Tokens, f
+import requests, json
 
-reminder = Blueprint('reminder', __name__, url_prefix='/reminder')
+tokens = Blueprint('tokens', __name__, url_prefix='/tokens')
 
-@reminder.route("/add", methods=['POST'])
+@tokens.route("/refresh", methods=['GET'])
 def register():
-  body = request.get_json()
-  mail = Reminder(email=body['email'], puuid=body['puuid'], skin_id=body['skin_id'], region=body['region'])
-  db.session.add(mail)
-  db.session.commit()
+  tokens = Tokens.query.all()
+  for i in tokens:
+    cookies = f.decrypt(bytes(list(i.cookies))).decode("utf-8").replace("\'", "\"")
+    cookies = json.loads(cookies)
+    payload = {
+      "cookies": cookies
+    }
+    r = requests.post(f'{request.url_root}auth/refresh', json=payload).json()          
+    i.access_token = f.encrypt(bytes(r['access_token'], encoding='utf-8'))
+    i.entitlement_token = f.encrypt(bytes(r['entitlement_token'], encoding='utf-8'))
+    i.cookies = f.encrypt(bytes(str(r['cookies']), encoding='utf-8'))
+    db.session.commit()
   return {
-    "status": 200,
-    "message": "reminder created"
-  }, 200
-  
-@reminder.route("/delete", methods=['DELETE'])
-def unsubscribe():
-  body = request.get_json()
-  mail = db.one_or_404(db.select(Reminder).filter_by(skin_id=body['skin_id'], email=body['email']))  
-  db.session.delete(mail)
-  db.session.commit()
-  return {
-    "status": 200,
-    "message": "reminder deleted"
+    "status": 200
   }, 200

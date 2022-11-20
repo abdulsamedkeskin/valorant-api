@@ -72,8 +72,6 @@ def user():
   body = request.get_json()
   login = Login.query.filter_by(cookies=str(body.get('cookies'))).first()
   response = f.decrypt(bytes(list(login.response))).decode("utf-8").replace("\'", "\"")
-  db.session.delete(login)
-  db.session.commit()
   return json.loads(response)
   
 @auth.route("/refresh", methods=['POST'])

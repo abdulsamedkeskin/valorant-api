@@ -23,6 +23,7 @@ def create_app():
     from .contents import contents
     from .mail import mail
     from .reminder import reminder
+    from .tokens import tokens
     app.register_blueprint(auth)
     app.register_blueprint(store)
     app.register_blueprint(game)
@@ -32,6 +33,7 @@ def create_app():
     app.register_blueprint(contents)
     app.register_blueprint(mail)
     app.register_blueprint(reminder)
+    app.register_blueprint(tokens)
     with app.app_context():
         db.create_all()
     return app

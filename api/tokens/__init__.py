@@ -1,1 +1,1 @@
-from .views import reminder
+from .views import tokens
