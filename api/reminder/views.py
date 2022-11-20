@@ -2,7 +2,7 @@ from flask import Blueprint, request
 from api.models import db, Reminder, Tokens, f
 from api import f_mail
 import json
-import grequests
+import requests
 from flask_mail import Message
 
 reminder = Blueprint('reminder', __name__, url_prefix='/reminder')
@@ -49,7 +49,7 @@ def send():
           "region": region,
           "puuid": puuid
         }
-        r = grequests.post(f'{request.url_root}store/current?language={i.language}', json=payload).json()          
+        r = requests.post(f'{request.url_root}store/current?language={i.language}', json=payload).json()          
         for x in reminders:
           for _ in r:
             if _['type'] == 'single':
@@ -72,7 +72,7 @@ def send():
           "entitlement_token": entitlement_token,
           "puuid": puuid
         }
-        r = grequests.post(f'{request.url_root}store/current?language={i.language}', json=payload).json()          
+        r = requests.post(f'{request.url_root}store/current?language={i.language}', json=payload).json()          
         for _ in r:
           if _['type'] == "single":
             for z in _['data']:
