@@ -2,8 +2,7 @@ from flask import Blueprint, request
 import cloudscraper
 from ..constants import auth_cookies, auth_payload, multifactor_payload, user_agent, base_header
 from .utils import parse_accessToken
-import jwt, json
-from api.models import db, Login, f
+import jwt
 
 auth = Blueprint('auth', __name__, url_prefix='/auth')
 
@@ -15,7 +14,12 @@ def login():
     multifactor_payload.update({"code": body.get('code')})
     auth = scraper.put("https://auth.riotgames.com/api/v1/authorization", json=multifactor_payload, cookies=body.get('cookies')).json()
     if auth['type'] == 'error':
-      return auth
+      if auth['error'] == "invalid_session_id":
+        return {
+          "status":400,
+          "name": "BAD_REQUEST",
+          "description": "This code was invalid. Please try again."
+        }, 400
     id_token, accessToken = parse_accessToken(auth)
     base_header.update({
         "Authorization": f"Bearer {accessToken}",
@@ -44,26 +48,40 @@ def login():
       "email": auth['multifactor']['email'],
       "cookies": scraper.cookies.get_dict()
     }, 200
-  id_token, accessToken = parse_accessToken(auth)
-  base_header.update({
-        "Authorization": f"Bearer {accessToken}",
-  })
-  entitlement_token = scraper.post("https://entitlements.auth.riotgames.com/api/token/v1", headers=base_header)
-  entitlement_token = entitlement_token.json()['entitlements_token']
-  user = jwt.decode(accessToken, options={"verify_signature": False})
-  account_name = jwt.decode(id_token, options={"verify_signature": False})['acct']
-  return {
-    "cookies": scraper.cookies.get_dict(),
-    "access_token": accessToken,
-    "entitlement_token": entitlement_token,
-    "puuid": user['sub'],
-    "region": user['pp']['c'],
-    **account_name
-  }
+  try:
+    id_token, accessToken = parse_accessToken(auth)
+    base_header.update({
+          "Authorization": f"Bearer {accessToken}",
+    })
+    entitlement_token = scraper.post("https://entitlements.auth.riotgames.com/api/token/v1", headers=base_header)
+    entitlement_token = entitlement_token.json()['entitlements_token']
+    user = jwt.decode(accessToken, options={"verify_signature": False})
+    account_name = jwt.decode(id_token, options={"verify_signature": False})['acct']
+    return {
+      "cookies": scraper.cookies.get_dict(),
+      "access_token": accessToken,
+      "entitlement_token": entitlement_token,
+      "puuid": user['sub'],
+      "region": user['pp']['c'],
+      **account_name
+    }
+  except:
+    return {
+      "status": 400,
+      "name": "BAD_REQUEST",
+      "description": "Wrong username or password",
+    }, 400
   
 @auth.route("/refresh", methods=['POST'])
 def refresh():
-  cookies = request.get_json()['cookies']
+  try:
+    cookies = request.get_json()['cookies']
+  except:
+    return {
+      "status":400,
+      "name": "BAD_REQUEST",
+      "description": "cookies not found"
+    }, 400
   scraper = cloudscraper.create_scraper(browser=user_agent)
   refresh_token = scraper.get("https://auth.riotgames.com/authorize?redirect_uri=https%3A%2F%2Fplayvalorant.com%2Fopt_in&client_id=play-valorant-web-prod&response_type=token%20id_token&nonce=1", allow_redirects=False, cookies=cookies)
   accessToken = refresh_token.text.split("access_token=")[1].split("&amp")[0]
@@ -79,4 +97,4 @@ def refresh():
     "puuid": user['sub'],
     "region": user['pp']['c'],
     "cookies": scraper.cookies.get_dict()
-  }
+  }, 200

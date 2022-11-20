@@ -4,6 +4,8 @@ from .models import db
 from flask_migrate import Migrate
 from flask_cors import CORS
 from flask_mail import Mail
+from werkzeug.exceptions import HTTPException
+import json
 
 f_mail = Mail()
 
@@ -34,6 +36,18 @@ def create_app():
     app.register_blueprint(mail)
     app.register_blueprint(reminder)
     app.register_blueprint(tokens)
+    
+    @app.errorhandler(HTTPException)
+    def handle_exception(e):
+        response = e.get_response()
+        response.data = json.dumps({
+            "code": e.code,
+            "name": e.name,
+            "description": e.description,
+        })
+        response.content_type = "application/json"
+        return response
+    
     with app.app_context():
         db.create_all()
     return app

@@ -2,7 +2,7 @@ from flask import Blueprint, request
 from api.models import db, Reminder, Tokens, f
 from api import f_mail
 import json
-import requests
+import grequests
 from flask_mail import Message
 
 reminder = Blueprint('reminder', __name__, url_prefix='/reminder')
@@ -49,18 +49,18 @@ def send():
           "region": region,
           "puuid": puuid
         }
-        r = requests.post(f'{request.url_root}store/current?language={i.language}', json=payload).json()          
+        r = grequests.post(f'{request.url_root}store/current?language={i.language}', json=payload).json()          
         for x in reminders:
           for _ in r:
             if _['type'] == 'single':
               for z in _['data']:
                 if z['uuid'] == x.skin_id:      
                   msg = Message(f"Valorant Shop Reminder",sender =('Valorant Daily Store','valorantstore.123@gmail.com'), recipients =[reminders.first().email])
-                  msg.body = f"{z['displayName']} şu anda Mağazada"
+                  msg.body = f"{z['displayName']} in store now"
                   f_mail.send(msg)
                   db.session.delete(reminders.first())
                   db.session.commit()
-    else:
+    elif length == 1:
       if reminders.first().puuid == i.puuid:
         access_token = f.decrypt(bytes(list(i.access_token))).decode("utf-8")
         entitlement_token = f.decrypt(bytes(list(i.entitlement_token))).decode("utf-8")
@@ -72,17 +72,23 @@ def send():
           "entitlement_token": entitlement_token,
           "puuid": puuid
         }
-        r = requests.post(f'{request.url_root}store/current?language={i.language}', json=payload).json()          
+        r = grequests.post(f'{request.url_root}store/current?language={i.language}', json=payload).json()          
         for _ in r:
           if _['type'] == "single":
             for z in _['data']:
               if z['uuid'] == reminders.first().skin_id:      
                 msg = Message(f"Valorant Shop Reminder",sender =('Valorant Daily Store','valorantstore.123@gmail.com'), recipients =[reminders.first().email])
-                msg.body = f"{z['displayName']} şu anda Mağazada"
+                msg.body = f"{z['displayName']} in store now"
                 f_mail.send(msg)
                 db.session.delete(reminders.first())
                 db.session.commit()
                 break
+    else:
+        return {
+            "status": 400,
+            "name": "BAD_REQUEST",
+            "description": "no records"
+        }, 400
   return {
     "status": 200
   }, 200

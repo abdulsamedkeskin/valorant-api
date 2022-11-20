@@ -1,9 +1,10 @@
 from flask import Blueprint, request, render_template
 from api.models import db, Mail, Tokens, f
-import requests, json
+import json
 from flask_mail import Message
 from datetime import date
 from api import f_mail
+import grequests
 
 mail = Blueprint('mail', __name__, url_prefix='/mail')
 
@@ -56,9 +57,9 @@ def send():
       "region": region,
       "puuid": puuid
     }
-    r = requests.post(f'{request.url_root}store/current?language={tokens.language}', json=payload).json()
+    r = grequests.post(f'{request.url_root}store/current?language={tokens.language}', json=payload).json()
     today = date.today()
-    msg = Message(f"{today.strftime('%d/%m/%Y')} tarihli Valorant mağazanız",sender =('Valorant Daily Store','valorantstore.123@gmail.com'), recipients =[i.email])
+    msg = Message(f"Your Valorant store on {today.strftime('%d/%m/%Y')}",sender =('Valorant Daily Store','valorantstore.123@gmail.com'), recipients =[i.email])
     msg.html = render_template("mail.html",results=r, email=i.email) 
     f_mail.send(msg)
   return {
