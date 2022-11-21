@@ -10,6 +10,12 @@ reminder = Blueprint('reminder', __name__, url_prefix='/reminder')
 @reminder.route("/add", methods=['POST'])
 def register():
   body = request.get_json()
+  check_ = Reminder.query.filter_by(email=body['email'], skin_id=body['skin_id'])
+  if check_.count() >= 1:
+    return {
+      "status": 400,
+      "message": "reminder already added"
+    }, 400
   reminder = Reminder(email=body['email'], puuid=body['puuid'], skin_id=body['skin_id'], region=body['region'])
   db.session.add(reminder)
   db.session.commit()
@@ -21,12 +27,32 @@ def register():
 @reminder.route("/delete", methods=['DELETE'])
 def unsubscribe():
   body = request.get_json()
-  mail = db.one_or_404(db.select(Reminder).filter_by(skin_id=body['skin_id'], email=body['email']))  
+  mail = Reminder.query.filter_by(email=body['email'], skin_id=body['skin_id'])
+  if not mail.count() == 1:
+     return {
+      "status": 404,
+      "message": "reminder not found"
+    }, 404
   db.session.delete(mail)
   db.session.commit()
   return {
     "status": 200,
     "message": "reminder deleted"
+  }, 200
+  
+@reminder.route("/get", methods=['POST'])
+def get_reminders():
+  body = request.get_json()
+  reminder = Reminder.query.filter_by(puuid=body['puuid'])
+  if not reminder.count() == 1:
+     return {
+      "status": 404,
+      "message": "reminder not found"
+    }, 404
+  data = [i for i in reminder]
+  return {
+    "status": 200,
+    "data": data
   }, 200
   
 @reminder.route("/send", methods=['GET'])

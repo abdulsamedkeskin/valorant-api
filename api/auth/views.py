@@ -57,10 +57,9 @@ def login():
     entitlement_token = entitlement_token.json()['entitlements_token']
     user = jwt.decode(accessToken, options={"verify_signature": False})
     account_name = jwt.decode(id_token, options={"verify_signature": False})['acct']
-    cookies = scraper.cookies.get_dict()
     return {
       "status": 200,
-      "cookies": cookies,
+      "cookies": scraper.cookies.get_dict(),
       "access_token": accessToken,
       "entitlement_token": entitlement_token,
       "puuid": user['sub'],

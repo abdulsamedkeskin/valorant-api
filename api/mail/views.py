@@ -11,8 +11,8 @@ mail = Blueprint('mail', __name__, url_prefix='/mail')
 @mail.route("/register", methods=['POST'])
 def register():
   body = request.get_json()
-  check_ = Mail.query.filter_by(email=body['email']).first()
-  if check_:
+  check_ = Mail.query.filter_by(email=body['email'])
+  if check_.count() == 1:
     return {
       "status": 400,
       "message": "email already registered"
@@ -31,7 +31,12 @@ def register():
   
 @mail.route("/unsubscribe/<email>", methods=['GET'])
 def unsubscribe(email):
-  mail = db.one_or_404(db.select(Mail).filter_by(email=email),description="Mail is not registered")  
+  mail = Mail.query.filter_by(email=email)
+  if not mail.count() == 1:
+    return {
+      "status": 404,
+      "message": "registered email not found"
+    }, 404
   db.session.delete(mail)
   db.session.commit()
   return {
