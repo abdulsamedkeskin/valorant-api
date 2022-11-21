@@ -30,6 +30,7 @@ def login():
     user = jwt.decode(accessToken, options={"verify_signature": False})
     account_name = jwt.decode(id_token, options={"verify_signature": False})['acct']
     return {
+      "status": 200,
       "access_token": accessToken,
       "entitlement_token": entitlement_token,
       "puuid": user['sub'],
@@ -44,6 +45,7 @@ def login():
   auth = scraper.put("https://auth.riotgames.com/api/v1/authorization", json=auth_payload, cookies=cookie_request.cookies, headers=base_header).json()
   if auth['type'] == "multifactor":
     return {
+      "status": 200,
       "type": "multifactor",
       "email": auth['multifactor']['email'],
       "cookies": scraper.cookies.get_dict()
@@ -58,6 +60,7 @@ def login():
     user = jwt.decode(accessToken, options={"verify_signature": False})
     account_name = jwt.decode(id_token, options={"verify_signature": False})['acct']
     return {
+      "status": 200,
       "cookies": scraper.cookies.get_dict(),
       "access_token": accessToken,
       "entitlement_token": entitlement_token,
@@ -99,6 +102,7 @@ def refresh():
   entitlement_token = entitlement_token.json()['entitlements_token']
   user = jwt.decode(accessToken, options={"verify_signature": False})
   return {
+    "status": 200,
     "access_token": accessToken,
     "entitlement_token": entitlement_token,
     "puuid": user['sub'],

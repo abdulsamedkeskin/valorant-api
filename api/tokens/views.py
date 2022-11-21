@@ -8,7 +8,7 @@ from flask_mail import Message
 tokens = Blueprint('tokens', __name__, url_prefix='/tokens')
 
 @tokens.route("/refresh", methods=['GET'])
-def register():
+def refresh():
   tokens = Tokens.query.all()
   for i in tokens:
     cookies = f.decrypt(bytes(list(i.cookies))).decode("utf-8").replace("\'", "\"")
@@ -18,11 +18,12 @@ def register():
     }
     r = requests.post(f'{request.url_root}auth/refresh', json=payload).json()  
     if r['status'] == 400:
-      email = Mail.query.filter_by(puuid=i.puuid).first()
-      if not email:
-        email = Reminder.query.filter_by(puuid=i.puuid).first()
-      msg = Message('You need to login again',sender =('Valorant Daily Store','valorantstore.123@gmail.com'), recipients =[email.email])
-      msg.html = "<p>use the <a href='# todo'>link</a> to login.</p>" 
+      email = Mail.query.filter_by(puuid=i.puuid)
+      if email.count() == 0:
+        email = Reminder.query.filter_by(puuid=i.puuid)
+      msg = Message('You need to login again',sender =('Valorant Daily Store','valorantstore.123@gmail.com'), recipients =[email.first().email])
+      # todo link
+      msg.html = "<p>use the <a href=''>link</a> to login.</p>" 
       f_mail.send(msg)    
     i.access_token = f.encrypt(bytes(r['access_token'], encoding='utf-8'))
     i.entitlement_token = f.encrypt(bytes(r['entitlement_token'], encoding='utf-8'))
