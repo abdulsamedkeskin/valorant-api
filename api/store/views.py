@@ -1,6 +1,6 @@
 from flask import Blueprint, request
-import cloudscraper
-from ..constants import user_agent, base_header, ItemTypeID, currency
+from api.utils import scraper
+from ..constants import base_header, ItemTypeID, currency
 from api.utils import session, get_contents
 
 store = Blueprint('store', __name__, url_prefix='/store')
@@ -56,7 +56,6 @@ def offers():
 
 @store.route("/current", methods=['POST'])
 def shop():
-  scraper = cloudscraper.create_scraper(browser=user_agent)
   body = request.get_json()
   language = request.args.get("language", "en-US")
   base_header.update({
@@ -94,7 +93,6 @@ def shop():
 
 @store.route("/wallet", methods=['POST'])
 def wallet():
-  scraper = cloudscraper.create_scraper(browser=user_agent)
   body = request.get_json()
   base_header.update({
     "X-Riot-Entitlements-JWT": body.get('entitlement_token'),

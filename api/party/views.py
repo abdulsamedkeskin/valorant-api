@@ -1,12 +1,11 @@
 from flask import Blueprint, request
-import cloudscraper
-from ..constants import user_agent, base_header, client_version
+from api.utils import scraper
+from ..constants import base_header, client_version
 
 party = Blueprint('party', __name__, url_prefix='/party')
 
 @party.route("/party_id")
 def party_id():
-  scraper = cloudscraper.create_scraper(browser=user_agent)
   body = request.get_json()
   base_header.update({
     "X-Riot-Entitlements-JWT": body.get('entitlement_token'),
@@ -18,7 +17,6 @@ def party_id():
 
 @party.route("/remove_from_party")
 def remove():
-  scraper = cloudscraper.create_scraper(browser=user_agent)
   body = request.get_json()
   base_header.update({
     "X-Riot-Entitlements-JWT": body.get('entitlement_token'),
@@ -29,7 +27,6 @@ def remove():
 
 @party.route("/info")
 def info():
-  scraper = cloudscraper.create_scraper(browser=user_agent)
   body = request.get_json()
   base_header.update({
     "X-Riot-Entitlements-JWT": body.get('entitlement_token'),
@@ -41,7 +38,6 @@ def info():
 
 @party.route("/set_ready")
 def set_ready():
-  scraper = cloudscraper.create_scraper(browser=user_agent)
   body = request.get_json()
   base_header.update({
     "X-Riot-Entitlements-JWT": body.get('entitlement_token'),
@@ -52,7 +48,6 @@ def set_ready():
 
 @party.route("/refresh_tier")
 def refresh_tier():
-  scraper = cloudscraper.create_scraper(browser=user_agent)
   body = request.get_json()
   base_header.update({
     "X-Riot-Entitlements-JWT": body.get('entitlement_token'),
@@ -64,7 +59,6 @@ def refresh_tier():
 
 @party.route("/refresh_identity")
 def refresh_identity():
-  scraper = cloudscraper.create_scraper(browser=user_agent)
   body = request.get_json()
   base_header.update({
     "X-Riot-Entitlements-JWT": body.get('entitlement_token'),
@@ -76,7 +70,6 @@ def refresh_identity():
 
 @party.route("/refresh_ping")
 def refresh_ping():
-  scraper = cloudscraper.create_scraper(browser=user_agent)
   body = request.get_json()
   base_header.update({
     "X-Riot-Entitlements-JWT": body.get('entitlement_token'),
@@ -88,7 +81,6 @@ def refresh_ping():
 
 @party.route("/change_queue")
 def change_queue():
-  scraper = cloudscraper.create_scraper(browser=user_agent)
   body = request.get_json()
   base_header.update({
     "X-Riot-Entitlements-JWT": body.get('entitlement_token'),
@@ -100,7 +92,6 @@ def change_queue():
   
 @party.route("/start_custom_game")
 def start_custom_game():
-  scraper = cloudscraper.create_scraper(browser=user_agent)
   body = request.get_json()
   base_header.update({
     "X-Riot-Entitlements-JWT": body.get('entitlement_token'),
@@ -113,7 +104,6 @@ def start_custom_game():
 @party.route("/matchmaking_queue")
 def matchmaking_queue():
   type_ = request.args.get("type", default="enter")
-  scraper = cloudscraper.create_scraper(browser=user_agent)
   body = request.get_json()
   base_header.update({
     "X-Riot-Entitlements-JWT": body.get('entitlement_token'),
@@ -127,7 +117,6 @@ def matchmaking_queue():
 
 @party.route("/set_party_accessibility")
 def set_party_accessibility():
-  scraper = cloudscraper.create_scraper(browser=user_agent)
   body = request.get_json()
   base_header.update({
     "X-Riot-Entitlements-JWT": body.get('entitlement_token'),
@@ -138,7 +127,6 @@ def set_party_accessibility():
 
 @party.route("/set_custom_game_settings")
 def set_custom_game_settings():
-  scraper = cloudscraper.create_scraper(browser=user_agent)
   body = request.get_json()
   base_header.update({
     "X-Riot-Entitlements-JWT": body.get('entitlement_token'),
@@ -163,7 +151,6 @@ def set_custom_game_settings():
 
 @party.route("/invite_by_display_name")
 def invite_by_display_name():
-  scraper = cloudscraper.create_scraper(browser=user_agent)
   body = request.get_json()
   base_header.update({
     "X-Riot-Entitlements-JWT": body.get('entitlement_token'),
@@ -175,7 +162,6 @@ def invite_by_display_name():
 
 @party.route("/request_to_join")
 def request_to_join():
-  scraper = cloudscraper.create_scraper(browser=user_agent)
   body = request.get_json()
   base_header.update({
     "X-Riot-Entitlements-JWT": body.get('entitlement_token'),
@@ -186,7 +172,6 @@ def request_to_join():
 
 @party.route("/decline_request")
 def decline_request():
-  scraper = cloudscraper.create_scraper(browser=user_agent)
   body = request.get_json()
   base_header.update({
     "X-Riot-Entitlements-JWT": body.get('entitlement_token'),
@@ -198,7 +183,6 @@ def decline_request():
   
 @party.route("/fetch_custom_game_config")
 def fetch_custom_game_config():
-  scraper = cloudscraper.create_scraper(browser=user_agent)
   body = request.get_json()
   base_header.update({
     "X-Riot-ClientVersion": client_version
@@ -208,7 +192,6 @@ def fetch_custom_game_config():
 
 @party.route("/tokens")
 def tokens():
-  scraper = cloudscraper.create_scraper(browser=user_agent)
   body = request.get_json()
   base_header.update({
     "X-Riot-Entitlements-JWT": body.get('entitlement_token'),

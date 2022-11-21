@@ -1,13 +1,12 @@
 from flask import Blueprint, request
-import cloudscraper
-from ..constants import user_agent, base_header
+from api.utils import scraper
+from ..constants import base_header
 
 session = Blueprint('session', __name__, url_prefix='/session')
 
 @session.route("/", methods=['POST'])
 def index():
   reconnect_ = request.args.get("reconnect", default=False)
-  scraper = cloudscraper.create_scraper(browser=user_agent)
   body = request.get_json()
   base_header.update({
     "X-Riot-Entitlements-JWT": body.get('entitlement_token'),

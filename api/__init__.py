@@ -6,6 +6,7 @@ from flask_cors import CORS
 from flask_mail import Mail
 from werkzeug.exceptions import HTTPException
 import json
+from .utils import scraper
 
 f_mail = Mail()
 
@@ -47,6 +48,10 @@ def create_app():
         })
         response.content_type = "application/json"
         return response
+    @app.before_request
+    def clear_cookies():
+        scraper.cookies.clear()
+
     
     with app.app_context():
         db.create_all()

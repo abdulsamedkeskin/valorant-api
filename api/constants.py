@@ -1,6 +1,5 @@
 from .utils import session
 
-user_agent = {'custom':'RiotClient/60.0.6.4770705.4749685 rso-auth (Windows;10;;Professional, x64)' }
 auth_cookies = {
     "client_id": "play-valorant-web-prod",
     "nonce": "1",

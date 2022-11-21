@@ -1,12 +1,11 @@
 from flask import Blueprint, request
-import cloudscraper
-from ..constants import user_agent, base_header
+from ..constants import base_header
+from api.utils import scraper
 
 pre_game = Blueprint('pre_game', __name__, url_prefix='/pre_game')
 
 @pre_game.route("/match_id", methods=['POST'])
 def match_id():
-  scraper = cloudscraper.create_scraper(browser=user_agent)
   body = request.get_json()
   base_header.update({
     "X-Riot-Entitlements-JWT": body.get('entitlement_token'),
@@ -17,7 +16,6 @@ def match_id():
 
 @pre_game.route("/match", methods=['POST'])
 def match():
-  scraper = cloudscraper.create_scraper(browser=user_agent)
   body = request.get_json()
   base_header.update({
     "X-Riot-Entitlements-JWT": body.get('entitlement_token'),
@@ -29,7 +27,6 @@ def match():
 
 @pre_game.route("/loadouts", methods=['POST'])
 def loadouts():
-  scraper = cloudscraper.create_scraper(browser=user_agent)
   body = request.get_json()
   base_header.update({
     "X-Riot-Entitlements-JWT": body.get('entitlement_token'),
@@ -40,7 +37,6 @@ def loadouts():
 
 @pre_game.route("/tokens", methods=['POST'])
 def tokens():
-  scraper = cloudscraper.create_scraper(browser=user_agent)
   body = request.get_json()
   base_header.update({
     "X-Riot-Entitlements-JWT": body.get('entitlement_token'),
@@ -55,7 +51,6 @@ def tokens():
 
 @pre_game.route("/select_and_lock", methods=['POST'])
 def select_and_lock():  
-  scraper = cloudscraper.create_scraper(browser=user_agent)
   body = request.get_json()
   base_header.update({
     "X-Riot-Entitlements-JWT": body.get('entitlement_token'),
@@ -68,7 +63,6 @@ def select_and_lock():
 
 @pre_game.route("/quit", methods=['POST'])
 def quit():
-  scraper = cloudscraper.create_scraper(browser=user_agent)
   body = request.get_json()
   base_header.update({
     "X-Riot-Entitlements-JWT": body.get('entitlement_token'),

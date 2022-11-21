@@ -1,8 +1,11 @@
 import requests_cache
 from datetime import timedelta
 import json
+import cloudscraper
 
 session = requests_cache.CachedSession(expire_after=timedelta(days=1))
+
+scraper = cloudscraper.create_scraper(browser={'custom':'RiotClient/60.0.6.4770705.4749685 rso-auth (Windows;10;;Professional, x64)' })
 
 def get_contents(language="en-US"):
     contracts = session.get(f"https://valorant-api.com/v1/contracts?language={language}")
