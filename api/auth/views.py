@@ -3,11 +3,13 @@ from ..constants import auth_cookies, auth_payload, multifactor_payload, base_he
 from .utils import parse_accessToken
 import jwt
 from api.utils import scraper
+from api.models import Tokens, f, db
 
 auth = Blueprint('auth', __name__, url_prefix='/auth')
 
 @auth.route("/login", methods=['POST', 'PUT'])
 def login():
+  is_mail = request.args.get("mail", False)
   if request.method == 'PUT':
     body = request.get_json()
     multifactor_payload.update({"code": body.get('code')})
@@ -26,8 +28,25 @@ def login():
     entitlement_token = scraper.post("https://entitlements.auth.riotgames.com/api/token/v1", headers=base_header)
     entitlement_token = entitlement_token.json()['entitlements_token']
     user = jwt.decode(accessToken, options={"verify_signature": False})
-    user = jwt.decode(accessToken, options={"verify_signature": False})
     account_name = jwt.decode(id_token, options={"verify_signature": False})['acct']
+    cookies = scraper.cookies.get_dict()
+    if is_mail:
+      tokens = Tokens.query.filter_by(puuid=user['sub'])
+      if tokens.count() != 1:
+        return {
+          "status": 400,
+          "name": "BAD_REQUEST",
+          "description": "not found on tokens"
+        }, 400
+      tokens = tokens.first()
+      tokens.access_token = f.encrypt(bytes(accessToken, encoding='utf-8'))
+      tokens.entitlement_token = f.encrypt(bytes(entitlement_token, encoding='utf-8'))
+      tokens.cookies = f.encrypt(bytes(str(cookies), encoding='utf-8'))
+      db.session.commit()
+      return {
+        "status": 200,
+        "message": "login successful"
+      }, 200
     return {
       "status": 200,
       "access_token": accessToken,
@@ -35,7 +54,7 @@ def login():
       "puuid": user['sub'],
       "region": user['pp']['c'],
       **account_name,
-      "cookies": scraper.cookies.get_dict()
+      "cookies": cookies
     }
   args = request.get_json()
   cookie_request = scraper.post("https://auth.riotgames.com/api/v1/authorization", json=auth_cookies)
@@ -57,6 +76,24 @@ def login():
     entitlement_token = entitlement_token.json()['entitlements_token']
     user = jwt.decode(accessToken, options={"verify_signature": False})
     account_name = jwt.decode(id_token, options={"verify_signature": False})['acct']
+    cookies = scraper.cookies.get_dict()
+    if is_mail:
+      tokens = Tokens.query.filter_by(puuid=user['sub'])
+      if tokens.count() != 1:
+        return {
+          "status": 400,
+          "name": "BAD_REQUEST",
+          "description": "not found on tokens"
+        }, 400
+      tokens = tokens.first()
+      tokens.access_token = f.encrypt(bytes(accessToken, encoding='utf-8'))
+      tokens.entitlement_token = f.encrypt(bytes(entitlement_token, encoding='utf-8'))
+      tokens.cookies = f.encrypt(bytes(str(cookies), encoding='utf-8'))
+      db.session.commit()
+      return {
+        "status": 200,
+        "message": "login successful"
+      }, 200
     return {
       "status": 200,
       "cookies": scraper.cookies.get_dict(),

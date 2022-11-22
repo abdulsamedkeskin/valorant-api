@@ -28,6 +28,14 @@ def get_contents(language="en-US"):
         res.update({"skins": skins.json()['data']})
         res.update({"characters": characters.json()['data']})
         res.update({"sprays": sprays.json()['data']})
+        data = []
+        for i in skin_levels.json()['data']:
+            if i['uuid'] == "d17aa037-40df-ce4d-1009-59a02323f002":
+                continue
+            if i['assetPath'].split("_PrimaryAsset")[0][-1] == "1":
+                if i['assetPath'].split("_Lv1_PrimaryAsset")[0].split("_")[1] != "Random":
+                    data.append(i)
+        res.update({"reminder": data})
         with open(f'contents_{language}.json', 'w', encoding='utf-8') as f:
             f.write(json.dumps([res], ensure_ascii=False))
         return [res]
