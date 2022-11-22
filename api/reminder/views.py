@@ -27,29 +27,29 @@ def register():
 @reminder.route("/delete", methods=['DELETE'])
 def unsubscribe():
   body = request.get_json()
-  mail = Reminder.query.filter_by(email=body['email'], skin_id=body['skin_id'])
-  if not mail.count() == 1:
+  reminder = Reminder.query.filter_by(email=body['email'], skin_id=body['skin_id'], puuid=body['puuid'])
+  if not reminder.count() == 1:
      return {
       "status": 404,
       "message": "reminder not found"
     }, 404
-  db.session.delete(mail)
+  db.session.delete(reminder.first())
   db.session.commit()
   return {
     "status": 200,
     "message": "reminder deleted"
   }, 200
   
-@reminder.route("/get", methods=['POST'])
+@reminder.route("/my_reminders", methods=['POST'])
 def get_reminders():
   body = request.get_json()
-  reminder = Reminder.query.filter_by(puuid=body['puuid'])
-  if not reminder.count() == 1:
+  reminder = Reminder.query.filter_by(puuid=body['puuid']).all()
+  if not len(reminder) >= 1:
      return {
       "status": 404,
       "message": "reminder not found"
     }, 404
-  data = [i for i in reminder]
+  data = [i.serialize() for i in reminder]
   return {
     "status": 200,
     "data": data

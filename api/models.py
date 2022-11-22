@@ -21,7 +21,14 @@ class Reminder(db.Model):
     skin_id = db.Column(db.String, nullable=False)
     puuid = db.Column(db.String, nullable=False)
     region = db.Column(db.String, nullable=False)
-    
+
+    def serialize(self):
+      return {
+       'id': self.id,
+       'email': self.email,
+       'skin_id': self.skin_id
+     }
+  
 class Tokens(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     cookies = db.Column(db.String, nullable=False)
