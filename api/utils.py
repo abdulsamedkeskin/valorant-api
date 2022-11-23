@@ -1,6 +1,7 @@
 import requests_cache
 from datetime import timedelta
-import orjson as json
+import orjson
+import json 
 import cloudscraper
 
 session = requests_cache.CachedSession(expire_after=timedelta(days=1))
@@ -41,5 +42,5 @@ def get_contents(language="en-US"):
         return [res]
     else:
         with open(f'contents_{language}.json', 'r', encoding="utf8") as f:
-            return json.loads(f.read())
+            return orjson.loads(f.read())
      
