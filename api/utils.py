@@ -1,6 +1,6 @@
 import requests_cache
 from datetime import timedelta
-import json
+import orjson as json
 import cloudscraper
 
 session = requests_cache.CachedSession(expire_after=timedelta(days=1))

@@ -48,7 +48,6 @@ def unsubscribe(email):
 def send():
   mail = Mail.query.all()
   for i in mail:
-    print(i)
     tokens = Tokens.query.filter_by(puuid=i.puuid).first()
     cookies = f.decrypt(bytes(list(tokens.cookies))).decode("utf-8").replace("\'", "\"")
     cookies = json.loads(cookies)

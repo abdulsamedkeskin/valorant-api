@@ -38,8 +38,15 @@ def create_app():
     app.register_blueprint(reminder)
     app.register_blueprint(tokens)
     
-    @app.errorhandler(HTTPException)
+    @app.errorhandler(Exception)
     def handle_exception(e):
+      if isinstance(e, KeyError):
+        return {
+            "code": 400,
+            "name": "BAD_REQUEST",
+            "description":"failed to decode access token"
+        },400
+      if isinstance(e, HTTPException):
         response = e.get_response()
         response.data = json.dumps({
             "code": e.code,
@@ -48,6 +55,7 @@ def create_app():
         })
         response.content_type = "application/json"
         return response
+    
     @app.before_request
     def clear_cookies():
         scraper.cookies.clear()
