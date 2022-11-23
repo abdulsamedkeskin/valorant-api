@@ -10,7 +10,7 @@ auth_cookies = {
 auth_payload = {
     "type": "auth",
     "remember": False,
-    "language": "tr_TR"
+    "language": "en_US"
 }
 multifactor_payload = {
     "type": "multifactor",
