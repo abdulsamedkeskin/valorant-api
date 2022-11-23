@@ -21,7 +21,7 @@ def refresh():
       email = Mail.query.filter_by(puuid=i.puuid)
       if email.count() == 0:
         email = Reminder.query.filter_by(puuid=i.puuid)
-      msg = Message('You need to login again',sender =('Valorant Daily Store','valorantstore.123@gmail.com'), recipients =[email.first().email])
+      msg = Message('You need to login again',sender =('Valorant Daily Store','mail.valorantstore@gmail.com'), recipients =[email.first().email])
       # todo link
       msg.html = "<p>use the <a href=''>link</a> to login.</p>" 
       f_mail.send(msg)    

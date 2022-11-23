@@ -48,6 +48,7 @@ def unsubscribe(email):
 def send():
   mail = Mail.query.all()
   for i in mail:
+    print(i)
     tokens = Tokens.query.filter_by(puuid=i.puuid).first()
     cookies = f.decrypt(bytes(list(tokens.cookies))).decode("utf-8").replace("\'", "\"")
     cookies = json.loads(cookies)
@@ -64,7 +65,7 @@ def send():
     }
     r = requests.post(f'{request.url_root}store/current?language={tokens.language}', json=payload).json()
     today = date.today()
-    msg = Message(f"Your Valorant store on {today.strftime('%d/%m/%Y')}",sender =('Valorant Daily Store','valorantstore.123@gmail.com'), recipients =[i.email])
+    msg = Message(f"Your Valorant store on {today.strftime('%d/%m/%Y')}",sender =('Valorant Daily Store','mail.valorantstore@gmail.com'), recipients =[i.email])
     msg.html = render_template("mail.html",results=r, email=i.email) 
     f_mail.send(msg)
   return {

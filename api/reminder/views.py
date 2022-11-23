@@ -81,7 +81,7 @@ def send():
             if _['type'] == 'single':
               for z in _['data']:
                 if z['uuid'] == x.skin_id:      
-                  msg = Message(f"Valorant Shop Reminder",sender =('Valorant Daily Store','valorantstore.123@gmail.com'), recipients =[reminders.first().email])
+                  msg = Message(f"Valorant Shop Reminder",sender =('Valorant Daily Store','mail.valorantstore@gmail.com'), recipients =[reminders.first().email])
                   msg.body = f"{z['displayName']} in store now"
                   f_mail.send(msg)
                   db.session.delete(reminders.first())
@@ -103,7 +103,7 @@ def send():
           if _['type'] == "single":
             for z in _['data']:
               if z['uuid'] == reminders.first().skin_id:      
-                msg = Message(f"Valorant Shop Reminder",sender =('Valorant Daily Store','valorantstore.123@gmail.com'), recipients =[reminders.first().email])
+                msg = Message(f"Valorant Shop Reminder",sender =('Valorant Daily Store','mail.valorantstore@gmail.com'), recipients =[reminders.first().email])
                 msg.body = f"{z['displayName']} in store now"
                 f_mail.send(msg)
                 db.session.delete(reminders.first())
