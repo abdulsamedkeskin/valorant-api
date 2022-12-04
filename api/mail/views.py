@@ -63,6 +63,8 @@ def send():
       "puuid": puuid
     }
     r = requests.post(f'{request.url_root}store/current?language={tokens.language}', json=payload).json()
+    if r.get('code') == 400:
+      continue
     today = date.today()
     msg = Message(f"Your Valorant store on {today.strftime('%d/%m/%Y')}",sender =('Valorant Daily Store','mail.valorantstore@gmail.com'), recipients =[i.email])
     msg.html = render_template("mail.html",results=r, email=i.email) 

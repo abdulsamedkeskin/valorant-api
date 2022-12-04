@@ -1,7 +1,6 @@
 import os
-from flask import current_app as app
 
-basedir = basedir = os.path.abspath(os.path.dirname(__file__) + "/..")
+basedir = os.path.abspath(os.path.dirname(__file__) + "/..")
 
 class Config:
     JSON_AS_ASCII = False
